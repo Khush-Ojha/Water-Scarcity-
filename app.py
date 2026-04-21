@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
-import plotly.express as px
+
 
 # =====================
 # FIX IMPORT PATH
@@ -30,27 +30,6 @@ st.subheader("📈 Global Water Consumption Trend")
 trend = df.groupby("Year")["Total Water Consumption (Billion m3)"].mean()
 st.line_chart(trend)
 
-# =====================
-# GLOBAL RISK MAP
-# =====================
-st.subheader("🌍 Global Water Risk Map")
-
-df["Risk Score"] = (
-    0.4 * df["Groundwater Depletion Rate (%)"] +
-    0.3 * (1000 - df["Rainfall Impact (mm)"]) / 1000 +
-    0.3 * df["Total Water Consumption (Billion m3)"] / 100
-)
-
-fig = px.choropleth(
-    df,
-    locations="Country",
-    locationmode="country names",
-    color="Risk Score",
-    title="Global Water Scarcity Risk",
-    color_continuous_scale="Reds"
-)
-
-st.plotly_chart(fig)
 
 # =====================
 # TOP 10 COUNTRIES
