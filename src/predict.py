@@ -2,17 +2,13 @@ import os
 import pickle
 import numpy as np
 
-# Get base project directory
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Correct paths
 model_path = os.path.join(BASE_DIR, "models", "model.pkl")
 scaler_path = os.path.join(BASE_DIR, "models", "scaler.pkl")
 
-# Load files
 model = pickle.load(open(model_path, "rb"))
 scaler = pickle.load(open(scaler_path, "rb"))
-
 
 def predict(consumption, groundwater, rainfall):
     
