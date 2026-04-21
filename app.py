@@ -54,9 +54,11 @@ st.plotly_chart(fig)
 # =====================
 # TOP 10 COUNTRIES
 # =====================
-st.subheader("🏆 Top 10 High Risk Countries")
+st.subheader("🏆 Top 10 High Risk Countries (2025)")
 
-top10 = df.sort_values("Risk Score", ascending=False).head(10)
+latest = df[df["Year"] == 2025]
+
+top10 = latest.sort_values("Risk Score", ascending=False).head(10)
 
 st.table(top10[["Country", "Risk Score"]])
 
