@@ -2,9 +2,8 @@ import pickle
 import numpy as np
 import os
 
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-model_path = os.path.join(base_dir, "models", "model.pkl")
-scaler_path = os.path.join(base_dir, "models", "scaler.pkl")
+model_path = os.path.join(os.path.dirname(__file__), "..", "models", "model.pkl")
+scaler_path = os.path.join(os.path.dirname(__file__), "..", "models", "scaler.pkl")
 
 model = pickle.load(open(model_path, "rb"))
 scaler = pickle.load(open(scaler_path, "rb"))
