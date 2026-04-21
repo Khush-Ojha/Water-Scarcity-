@@ -20,6 +20,7 @@ df = pd.read_csv("data/water.csv")
 # TITLE
 # =====================
 st.title("🌍 AI-Based Water Scarcity Analysis System")
+st.write("This AI system analyzes global water consumption trends and predicts water scarcity risk using machine learning models.")
 
 # =====================
 # TREND GRAPH
@@ -92,10 +93,15 @@ groundwater = st.slider("Groundwater Depletion Rate (%)", 0.1, 7.0)
 rainfall = st.slider("Rainfall Impact (mm)", 50.0, 3000.0)
 
 if st.button("Predict"):
-    
     result = predict(consumption, groundwater, rainfall)
 
-    st.write("Model Output:", result)
+    risk_score = (
+        0.4 * groundwater +
+        0.3 * (1000 - rainfall) / 1000 +
+        0.3 * (consumption / 100)
+    )
+
+    st.write("Risk Score:", round(risk_score, 2))
 
     if result == 2:
         st.error("🚨 High Risk")
