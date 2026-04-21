@@ -2,38 +2,105 @@ import streamlit as st
 import pandas as pd
 import sys
 import os
+import plotly.express as px
 
+# Fix import path
 sys.path.append(os.path.abspath("src"))
 
 from predict import predict
 
+# Load data
 df = pd.read_csv("data/water.csv")
 
-st.title("AI Water Scarcity Analysis")
+# Title
+st.title("🌍 AI-Based Water Scarcity Analysis System")
 
-# Trend
-st.subheader("Water Consumption Trend")
+st.write("This AI system analyzes global water consumption trends and predicts water scarcity risk.")
+
+# =====================
+# TREND GRAPH
+# =====================
+st.subheader("📈 Global Water Consumption Trend")
+
 trend = df.groupby("Year")["Total Water Consumption (Billion m3)"].mean()
 st.line_chart(trend)
 
-# Country Data
-st.subheader("Country Data")
+# =====================
+# RISK SCORE (FOR MAP + RANKING)
+# =====================
+df["Risk Score"] = (
+    0.4 * df["Groundwater Depletion Rate (%)"] +
+    0.3 * (1000 - df["Rainfall Impact (mm)"]) / 1000 +
+    0.3 * df["Total Water Consumption (Billion m3)"] / 100
+)
+
+# =====================
+# 🌍 WORLD MAP
+# =====================
+st.subheader("🌍 Global Water Risk Map")
+
+fig = px.choropleth(
+    df,
+    locations="Country",
+    locationmode="country names",
+    color="Risk Score",
+    title="Global Water Scarcity Risk",
+    color_continuous_scale="Reds"
+)
+
+st.plotly_chart(fig)
+
+# =====================
+# 🏆 TOP 10 COUNTRIES (FIXED)
+# =====================
+st.subheader("🏆 Top 10 High Risk Countries")
+
+country_risk = df.groupby("Country")["Risk Score"].mean().reset_index()
+top10 = country_risk.sort_values("Risk Score", ascending=False).head(10)
+
+st.table(top10)
+
+# =====================
+# COUNTRY DATA
+# =====================
+st.subheader("🌍 Country Data")
+
 country = st.selectbox("Select Country", df["Country"].unique())
 st.write(df[df["Country"] == country])
 
-# Prediction
-st.subheader("Predict Water Scarcity")
+# =====================
+# YEAR FILTER
+# =====================
+st.subheader("📅 Year-wise Analysis")
 
-consumption = st.slider("Water Consumption", 10.0, 800.0)
-groundwater = st.slider("Groundwater Depletion", 0.1, 7.0)
-rainfall = st.slider("Rainfall", 50.0, 3000.0)
+year = st.slider("Select Year", 2000, 2025)
+filtered = df[df["Year"] == year]
+
+st.bar_chart(filtered.set_index("Country")["Total Water Consumption (Billion m3)"])
+
+# =====================
+# PREDICTION
+# =====================
+st.subheader("🤖 Predict Water Scarcity")
+
+consumption = st.slider("Water Consumption (Billion m3)", 10.0, 800.0)
+groundwater = st.slider("Groundwater Depletion Rate (%)", 0.1, 7.0)
+rainfall = st.slider("Rainfall Impact (mm)", 50.0, 3000.0)
 
 if st.button("Predict"):
     result = predict(consumption, groundwater, rainfall)
 
+    risk_score = (
+        0.4 * groundwater +
+        0.3 * (1000 - rainfall) / 1000 +
+        0.3 * (consumption / 100)
+    )
+
+    st.write("Risk Score:", round(risk_score, 2))
+
     if result == 2:
-        st.error("High Risk")
+        st.error("🚨 High Risk")
     elif result == 1:
-        st.warning("Moderate Risk")
+        st.warning("⚠️ Moderate Risk")
     else:
-        st.success("Low Risk")
+        st.success("✅ Low Risk")
