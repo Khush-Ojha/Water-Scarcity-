@@ -33,6 +33,43 @@ top10 = country_risk.sort_values("Risk Score", ascending=False).head(10)
 
 st.table(top10)
 
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+st.subheader("🧠 Country Risk Clustering")
+
+features = [
+    "Total Water Consumption (Billion m3)",
+    "Groundwater Depletion Rate (%)",
+    "Rainfall Impact (mm)"
+]
+
+country_avg = df.groupby("Country")[features].mean()
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(country_avg)
+
+kmeans = KMeans(n_clusters=4, random_state=42)
+country_avg["Cluster"] = kmeans.fit_predict(X_scaled)
+
+st.write(country_avg.head())
+
+
+st.subheader("📍 Cluster Visualization")
+
+fig2, ax2 = plt.subplots()
+
+ax2.scatter(
+    country_avg["Groundwater Depletion Rate (%)"],
+    country_avg["Total Water Consumption (Billion m3)"],
+    c=country_avg["Cluster"]
+)
+
+ax2.set_xlabel("Groundwater Depletion")
+ax2.set_ylabel("Water Consumption")
+
+st.pyplot(fig2)
+
 # Country Data
 st.subheader("🌍 Country Data")
 country = st.selectbox("Select Country", df["Country"].unique())
