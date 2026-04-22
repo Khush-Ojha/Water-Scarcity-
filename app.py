@@ -99,6 +99,46 @@ ax2.set_ylabel("Water Consumption (Billion m3)")
 
 st.pyplot(fig2)
 
+st.subheader("📊 Feature Importance (Conceptual)")
+
+importance = {
+    "Groundwater Depletion": 0.53,
+    "Rainfall Impact": 0.12,
+    "Agriculture Use": 0.11,
+    "Industrial Use": 0.10,
+    "Consumption": 0.08,
+    "Per Capita": 0.05
+}
+
+st.bar_chart(pd.Series(importance))
+
+st.subheader("🌾 Sectoral Water Usage")
+
+sector = df[[
+    "Agricultural Water Use (%)",
+    "Industrial Water Use (%)",
+    "Household Water Use (%)"
+]].mean()
+
+st.bar_chart(sector)
+
+st.subheader("📈 Future Consumption Forecast")
+
+trend = df.groupby("Year")["Total Water Consumption (Billion m3)"].mean()
+
+future_years = list(range(2026, 2031))
+last_value = trend.iloc[-1]
+
+forecast = [last_value * (1 + 0.02*i) for i in range(1, 6)]
+
+forecast_df = pd.DataFrame({
+    "Year": future_years,
+    "Forecast": forecast
+}).set_index("Year")
+
+st.line_chart(forecast_df)
+
+
 # =====================
 # COUNTRY DATA
 # =====================
